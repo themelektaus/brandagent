@@ -1,0 +1,125 @@
+﻿@page "/"
+
+<div class="bar">
+    <div class="@ShareInfo_GetStyleClass()">
+        <div class="qr" style="@activeItem?.GetQrStyle()"></div>
+        <div class="secret">@activeItem?.secret</div>
+    </div>
+    <div class="content">
+        <div class="share" @onclick="Share_OnClick"></div>
+        <div class="otp">@activeItemOtp.otp</div>
+        <div class="timer">
+            <canvas @ref="timerCanvas" width="42" height="42"></canvas>
+            <span>@activeItemOtp.timer</span>
+        </div>
+        <div class="add" @onclick="Add_OnClick"></div>
+    </div>
+</div>
+<div class="items">
+    @foreach (var item in EnumerateItems())
+    {
+        <div class="@Item_GetStyleClass(item)" style="@item.GetStyle(data.colors)" @onclick="() => Item_OnClick(item)">
+            <div class="service" data-type="@item.service"></div>
+            <div class="name">@item.name</div>
+        </div>
+    }
+</div>
+
+@implements IDisposable
+
+@inject IJSRuntime js
+
+@code {
+
+    ElementReference timerCanvas;
+
+    bool visible;
+
+    string ShareInfo_GetStyleClass()
+    {
+        return "share-info" + (visible ? " visible" : "");
+    }
+
+    void Share_OnClick()
+    {
+        visible = !visible;
+    }
+
+    Data data;
+    Data.Item activeItem;
+    (string otp, int timer) activeItemOtp;
+    Task intervalTask;
+    bool disposed;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await base.OnInitializedAsync();
+
+        data = await Data.LoadAsync();
+        activeItem = data.items.FirstOrDefault();
+
+        intervalTask = Task.Run(async () =>
+        {
+            while (!disposed)
+            {
+                ComputeActiveItem();
+                await js.InvokeVoidAsync(
+                    "renderCircle",
+                    new object[] {
+                        timerCanvas,
+                        activeItemOtp.timer / 30f,
+                        5
+                    }
+                );
+                await InvokeAsync(StateHasChanged);
+                await Task.Delay(1000);
+            }
+        });
+    }
+
+    void ComputeActiveItem()
+    {
+        activeItemOtp = activeItem is null
+            ? default
+            : activeItem.Compute();
+    }
+
+    public void Dispose()
+    {
+        disposed = true;
+    }
+
+    IEnumerable<Data.Item> EnumerateItems()
+    {
+        if (data is null)
+            yield break;
+
+        if (data.items is null)
+            yield break;
+
+        var items = data.items
+            .Where(x => !x.hidden)
+            .OrderBy(x => x.service)
+            .ThenBy(x => x.name);
+
+        foreach (var item in items)
+            yield return item;
+    }
+
+    string Item_GetStyleClass(Data.Item item)
+    {
+        return $"item" + (item == activeItem ? " active" : "");
+    }
+
+    void Item_OnClick(Data.Item item)
+    {
+        activeItem = item;
+        ComputeActiveItem();
+    }
+
+    void Add_OnClick()
+    {
+        App.Current.MainPage.Navigation.PushModalAsync(new NewPage1());
+    }
+
+}
