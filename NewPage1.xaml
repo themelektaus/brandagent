@@ -4,9 +4,9 @@
              xmlns:zxing="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
              x:Class="Brandagent.NewPage1"
              BackgroundColor="#222">
-    <VerticalStackLayout>
+    <VerticalStackLayout VerticalOptions="Center" Scale=".75">
         <zxing:CameraBarcodeReaderView
             x:Name="cameraBarcodeReaderView"
-            BarcodesDetected="BarcodesDetected" />
+            BarcodesDetected="BarcodesDetected"/>
     </VerticalStackLayout>
 </ContentPage>

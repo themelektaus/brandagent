@@ -19,7 +19,12 @@
     @foreach (var item in EnumerateItems())
     {
         <div class="@Item_GetStyleClass(item)" style="@item.GetStyle(data.colors)" @onclick="() => Item_OnClick(item)">
-            <div class="service" data-type="@item.service"></div>
+            <div class="service" data-type="@item.service">
+                @if (item.service == string.Empty)
+                {
+                    <span>&nbsp;</span>
+                }
+            </div>
             <div class="name">@item.name</div>
         </div>
     }
@@ -119,7 +124,18 @@
 
     void Add_OnClick()
     {
-        App.Current.MainPage.Navigation.PushModalAsync(new NewPage1());
+        var page = new NewPage1();
+
+        page.Disappearing += async (sender, e) =>
+        {
+            if (page.Item is not null)
+            {
+                data.items.Add(page.Item);
+                await InvokeAsync(StateHasChanged);
+            }
+        };
+
+        App.Current.MainPage.Navigation.PushModalAsync(page);
     }
 
 }
