@@ -6,29 +6,32 @@
         <div class="secret">@activeItem?.secret</div>
     </div>
     <div class="content">
-        <div class="share" @onclick="Share_OnClick"></div>
+        <div class="button share" @onclick="Share_OnClick"></div>
         <div class="otp">@activeItemOtp.otp</div>
         <div class="timer">
             <canvas @ref="timerCanvas" width="42" height="42"></canvas>
             <span>@activeItemOtp.timer</span>
         </div>
-        <div class="add" @onclick="Add_OnClick"></div>
+        <div class="button add" @onclick="Add_OnClick"></div>
+        <div class="button import" @onclick="Import_OnClick"></div>
+        <div class="button export" @onclick="Export_OnClick"></div>
     </div>
 </div>
 <div class="items">
     @foreach (var item in EnumerateItems())
     {
-        <div class="@Item_GetStyleClass(item)" style="@item.GetStyle(data.colors)" @onclick="() => Item_OnClick(item)">
-            <div class="service" data-type="@item.service">
-                @if (item.service == string.Empty)
-                {
-                    <span>&nbsp;</span>
-                }
-            </div>
+        <div class="@Item_GetStyleClass(item)"
+             style="@item.GetStyle(data.colors)"
+             @onclick="() => Item_OnClick(item)">
+            <div class="service" data-type="@item.service"></div>
             <div class="name">@item.name</div>
         </div>
     }
 </div>
+
+@using Microsoft.Maui.Storage
+
+@using System.IO
 
 @implements IDisposable
 
@@ -62,12 +65,21 @@
 
         data = await Data.LoadAsync();
         activeItem = data.items.FirstOrDefault();
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        base.OnAfterRender(firstRender);
+
+        if (!firstRender)
+            return;
 
         intervalTask = Task.Run(async () =>
         {
             while (!disposed)
             {
                 ComputeActiveItem();
+
                 await js.InvokeVoidAsync(
                     "renderCircle",
                     new object[] {
@@ -76,6 +88,7 @@
                         5
                     }
                 );
+
                 await InvokeAsync(StateHasChanged);
                 await Task.Delay(1000);
             }
@@ -124,18 +137,77 @@
 
     void Add_OnClick()
     {
-        var page = new NewPage1();
+        var page = new Page_QrCodeScanner();
 
         page.Disappearing += async (sender, e) =>
         {
-            if (page.Item is not null)
+            if (page.ShouldClear)
+            {
+                data.items.Clear();
+                await data.SaveAsync();
+
+                activeItem = null;
+                ComputeActiveItem();
+
+                await InvokeAsync(StateHasChanged);
+            }
+            else if (page.Item is not null)
             {
                 data.items.Add(page.Item);
+                await data.SaveAsync();
+
+                activeItem = page.Item;
+                ComputeActiveItem();
+
                 await InvokeAsync(StateHasChanged);
             }
         };
 
         App.Current.MainPage.Navigation.PushModalAsync(page);
+    }
+
+    async Task Import_OnClick()
+    {
+        var result = await FilePicker.Default.PickAsync();
+
+        if (result is null)
+            return;
+
+
+        var data = await Data.LoadAsync(result.FullPath);
+
+        this.data.Add(data);
+
+        await this.data.SaveAsync();
+        await InvokeAsync(StateHasChanged);
+    }
+
+    async Task Export_OnClick()
+    {
+        string path = null;
+
+        var downloadPath = Path.Combine(
+            Android.OS.Environment.ExternalStorageDirectory.AbsolutePath,
+            "Download"
+        );
+
+        while (path is null)
+        {
+            var _path = Path.Combine(
+                downloadPath,
+                $"data-{DateTime.Now.Ticks}.json"
+            );
+
+            if (File.Exists(_path))
+            {
+                await Task.Delay(1000);
+                continue;
+            }
+
+            path = _path;
+        }
+
+        await data.SaveAsync(path);
     }
 
 }

@@ -33,17 +33,18 @@
     text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
+    height: 1em;
 }
 
 .bar > .content {
     display: flex;
     align-items: center;
     padding: 1em .5em .5em;
-    gap: 1em;
+    gap: .5em;
 }
 
-.bar > .content > .share {
-    background: url(share.svg) no-repeat;
+.bar > .content > .button {
+    background-repeat: no-repeat;
     background-size: 1.5em;
     background-position: center;
     width: 2.5em;
@@ -53,8 +54,12 @@
     flex: 0 0 auto;
 }
 
-.bar > .content > .share:active {
+.bar > .content > .button:active {
     background-color: #fff3;
+}
+
+.bar > .content > .share {
+    background-image: url(share.svg);
 }
 
 .bar > .content > .otp {
@@ -90,18 +95,15 @@
 }
 
 .bar > .content > .add {
-    background: url(add.svg) no-repeat;
-    background-size: 1.5em;
-    background-position: center;
-    width: 2.5em;
-    aspect-ratio: 1;
-    cursor: pointer;
-    border-radius: 50%;
-    flex: 0 0 auto;
+    background-image: url(add.svg);
 }
 
-.bar > .content > .add:active {
-    background-color: #fff3;
+.bar > .content > .import {
+    background-image: url(import.svg);
+}
+
+.bar > .content > .export {
+    background-image: url(export.svg);
 }
 
 .items {
@@ -138,6 +140,7 @@
     flex: 1;
     text-align: right;
     background-color: #0006;
+    height: 1.25em;
 }
 
 .item > .service::after {

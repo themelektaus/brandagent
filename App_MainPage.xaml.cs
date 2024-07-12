@@ -2,9 +2,9 @@
 
 namespace Brandagent;
 
-public partial class MainPage : ContentPage
+public partial class App_MainPage : ContentPage
 {
-    public MainPage()
+    public App_MainPage()
     {
         InitializeComponent();
     }

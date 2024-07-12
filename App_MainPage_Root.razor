@@ -1,10 +1,10 @@
-﻿<Router AppAssembly="@typeof(Root).Assembly">
+﻿<Router AppAssembly="@typeof(App_MainPage_Root).Assembly">
     <Found Context="routeData">
-        <RouteView RouteData="@routeData" DefaultLayout="@typeof(Root_MainLayout)" />
+        <RouteView RouteData="@routeData" DefaultLayout="@typeof(App_MainPage_RootLayout)" />
         <FocusOnNavigate RouteData="@routeData" Selector="h1" />
     </Found>
     <NotFound>
-        <LayoutView Layout="@typeof(Root_MainLayout)">
+        <LayoutView Layout="@typeof(App_MainPage_RootLayout)">
             <p role="alert">Sorry, there's nothing at this address.</p>
         </LayoutView>
     </NotFound>

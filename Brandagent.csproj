@@ -20,9 +20,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <MauiIcon Include="fire.svg" Color="#222222" />
-        <MauiSplashScreen Include="fire.svg" Color="#222222" />
-        <MauiAsset Include="data.json" />
+        <MauiIcon Include="appicon.svg" Color="#222222" />
+        <MauiSplashScreen Include="appicon.svg" Color="#222222" />
     </ItemGroup>
 
     <ItemGroup>
@@ -40,9 +39,9 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <MauiXaml Update="NewPage1.xaml">
-        <Generator>MSBuild:Compile</Generator>
-      </MauiXaml>
+      <Compile Update="App_MainPage.xaml.cs">
+        <DependentUpon>App_MainPage.xaml</DependentUpon>
+      </Compile>
     </ItemGroup>
 
     <ItemGroup>

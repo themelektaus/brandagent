@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:m="clr-namespace:ZXing.Net.Maui;assembly=ZXing.Net.MAUI"
+             xmlns:c="clr-namespace:ZXing.Net.Maui.Controls;assembly=ZXing.Net.MAUI.Controls"
+             x:Class="Brandagent.Page_QrCodeScanner"
+             BackgroundColor="#222">
+    <FlexLayout Direction="Column">
+        <VerticalStackLayout x:Name="ReaderContainer" Margin="30">
+            <c:CameraBarcodeReaderView x:Name="Reader" BarcodesDetected="Reader_BarcodesDetected">
+                <c:CameraBarcodeReaderView.Options>
+                    <m:BarcodeReaderOptions Formats="QrCode" />
+                </c:CameraBarcodeReaderView.Options>
+            </c:CameraBarcodeReaderView>
+        </VerticalStackLayout>
+        <Label FlexLayout.Grow="1" />
+        <!--Button x:Name="AddButton" Text="Add" Clicked="AddButton_Clicked" Margin="10,5,10,0"/-->
+        <!--Button x:Name="ClearButton" Text="Clear" Clicked="ClearButton_Clicked" Margin="10,5,10,0"/-->
+        <Button x:Name="CloseButton" Text="Close" Clicked="CloseButton_Clicked" Margin="10,5,10,10"/>
+    </FlexLayout>
+</ContentPage>

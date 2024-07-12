@@ -3,8 +3,8 @@
 using OtpNet;
 
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 
@@ -14,10 +14,61 @@ namespace Brandagent
     {
         readonly static JsonSerializerOptions jsonOptions = new() { IncludeFields = true };
 
+        static string GetPath()
+        {
+            return Path.Combine(
+                FileSystem.AppDataDirectory,
+                "data.json"
+            );
+        }
+
         public static async Task<Data> LoadAsync()
         {
-            using var stream = await FileSystem.Current.OpenAppPackageFileAsync("data.json");
-            return await JsonSerializer.DeserializeAsync<Data>(stream, jsonOptions);
+            return await LoadAsync(GetPath());
+        }
+
+        public static async Task<Data> LoadAsync(string path)
+        {
+
+            if (!File.Exists(path))
+            {
+                return new();
+            }
+
+            using var stream = File.OpenRead(path);
+
+            try
+            {
+                return await JsonSerializer.DeserializeAsync<Data>(stream, jsonOptions);
+            }
+            catch
+            {
+                var json = await File.ReadAllTextAsync(path);
+
+                return new();
+            }
+        }
+
+        public void Add(Data data)
+        {
+            foreach (var color in data.colors)
+                if (!colors.Any(x => x.name == color.name))
+                    colors.Add(color);
+
+            foreach (var item in data.items)
+                if (!items.Any(x => x.secret == item.secret))
+                    items.Add(item);
+        }
+
+        public async Task SaveAsync()
+        {
+            await SaveAsync(GetPath());
+        }
+
+        public async Task SaveAsync(string path)
+        {
+            using var stream = File.Create(path);
+            await JsonSerializer.SerializeAsync(stream, this, jsonOptions);
         }
 
         public class Color
@@ -26,7 +77,7 @@ namespace Brandagent
             public string value;
         }
 
-        public List<Color> colors;
+        public List<Color> colors = new();
 
         public class Item
         {
@@ -53,9 +104,16 @@ namespace Brandagent
 
             public (string otp, int timer) Compute()
             {
-                var secretKey = Base32Encoding.ToBytes(secret);
-                var totp = new Totp(secretKey);
-                return (totp.ComputeTotp().Insert(3, " "), totp.RemainingSeconds());
+                try
+                {
+                    var secretKey = Base32Encoding.ToBytes(secret);
+                    var totp = new Totp(secretKey);
+                    return (totp.ComputeTotp().Insert(3, " "), totp.RemainingSeconds());
+                }
+                catch
+                {
+                    return default;
+                }
             }
         }
         public List<Item> items = new();
