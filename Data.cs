@@ -2,6 +2,9 @@
 
 using OtpNet;
 
+using QRCoder;
+
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -12,7 +15,11 @@ namespace Brandagent
 {
     public class Data
     {
-        readonly static JsonSerializerOptions jsonOptions = new() { IncludeFields = true };
+        readonly static JsonSerializerOptions jsonOptions = new()
+        {
+            WriteIndented = true,
+            IncludeFields = true
+        };
 
         static string GetPath()
         {
@@ -71,6 +78,11 @@ namespace Brandagent
             await JsonSerializer.SerializeAsync(stream, this, jsonOptions);
         }
 
+        public string ToJson()
+        {
+            return JsonSerializer.Serialize(this, jsonOptions);
+        }
+
         public class Color
         {
             public string name;
@@ -85,7 +97,6 @@ namespace Brandagent
             public string name;
             public string secret;
             public string totp;
-            public string qr;
             public bool hidden;
 
             public string GetStyle(List<Color> colors)
@@ -97,24 +108,34 @@ namespace Brandagent
                 return $"background-color: {color.value}; ";
             }
 
-            public string GetQrStyle()
-            {
-                return $"background-image: url({qr}); ";
-            }
-
-            public (string otp, int timer) Compute()
+            public void Compute(out string otp, out int timer)
             {
                 try
                 {
                     var secretKey = Base32Encoding.ToBytes(secret);
                     var totp = new Totp(secretKey);
-                    return (totp.ComputeTotp().Insert(3, " "), totp.RemainingSeconds());
+                    otp = totp.ComputeTotp().Insert(3, " ");
+                    timer = totp.RemainingSeconds();
                 }
                 catch
                 {
-                    return default;
+                    otp = null;
+                    timer = 0;
                 }
             }
+
+            public string GenerateQr()
+            {
+                return "data:image/png;base64," + Convert.ToBase64String(
+                    PngByteQRCodeHelper.GetQRCode(totp, QRCodeGenerator.ECCLevel.M, 6)
+                );
+            }
+
+            public string GenerateQrStyle()
+            {
+                return $"background-image: url({GenerateQr()}); ";
+            }
+
         }
         public List<Item> items = new();
     }

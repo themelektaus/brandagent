@@ -1,0 +1,117 @@
+﻿@page "/tools"
+
+<div class="bar">
+    <div class="button back" @onclick="Back_OnClick"></div>
+    <div style="flex: 1; "></div>
+    <div class="button add" @onclick="Add_OnClick"></div>
+    <div class="button import" @onclick="Import_OnClick"></div>
+    <div class="button export" @onclick="Export_OnClick"></div>
+</div>
+
+<div class="content">
+    <h1>Colors</h1>
+    @for (var i = 0; i < Selection.data.colors.Count; i++)
+    {
+        var index = i;
+        var color = Selection.data.colors[i];
+        <div>
+            <input @bind="color.name" />
+            <input @bind="color.value" />
+            <div class="button close" @onclick="() => DeleteColor(index)"></div>
+        </div>
+    }
+    <div class="button add" @onclick="AddColor" style="align-self: center; "></div>
+</div>
+
+@using Microsoft.Maui.Storage
+
+@using System.IO
+
+@implements IAsyncDisposable
+
+@inject NavigationManager nav
+
+@code {
+
+    public async ValueTask DisposeAsync()
+    {
+        await Selection.data.SaveAsync();
+    }
+
+    void Back_OnClick()
+    {
+        nav.NavigateTo("/");
+    }
+
+    void Add_OnClick()
+    {
+        var page = new Page_QrCodeScanner();
+
+        page.Disappearing += async (sender, e) =>
+        {
+            if (page.ShouldClear)
+            {
+                Selection.data.items.Clear();
+                await Selection.data.SaveAsync();
+                return;
+            }
+
+            if (page.Item is not null)
+            {
+                Selection.data.items.Add(page.Item);
+                await Selection.data.SaveAsync();
+                return;
+            }
+        };
+
+        App.Current.MainPage.Navigation.PushModalAsync(page);
+    }
+
+    async Task Import_OnClick()
+    {
+        var result = await FilePicker.Default.PickAsync();
+
+        if (result is null)
+            return;
+
+        var import = await Data.LoadAsync(result.FullPath);
+        Selection.data.Add(import);
+
+        await Selection.data.SaveAsync();
+    }
+
+    async Task Export_OnClick()
+    {
+        string path = null;
+
+        var downloadPath = Utils.GetDownloadFolder();
+
+        while (path is null)
+        {
+            var _path = Path.Combine(
+                downloadPath,
+                $"data-{DateTime.Now.Ticks}.json"
+            );
+
+            if (File.Exists(_path))
+            {
+                await Task.Delay(1000);
+                continue;
+            }
+
+            path = _path;
+        }
+
+        await Selection.data.SaveAsync(path);
+    }
+
+    void DeleteColor(int index)
+    {
+        Selection.data.colors.RemoveAt(index);
+    }
+
+    void AddColor()
+    {
+        Selection.data.colors.Add(new());
+    }
+}

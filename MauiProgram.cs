@@ -22,8 +22,8 @@ namespace Brandagent
             services.AddMauiBlazorWebView();
 
 #if DEBUG
-			services.AddBlazorWebViewDeveloperTools();
-    		builder.Logging.AddDebug();
+            services.AddBlazorWebViewDeveloperTools();
+            builder.Logging.AddDebug();
 #endif
 
             return builder.Build();

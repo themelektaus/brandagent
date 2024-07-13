@@ -1,0 +1,44 @@
+﻿.bar {
+    display: flex;
+    padding: .5em;
+    gap: .5em;
+}
+
+.bar > .back {
+    background-image: url(back.svg);
+}
+
+.add {
+    background-image: url(add.svg);
+}
+
+.close {
+    background-image: url(close.svg);
+}
+
+.bar > .import {
+    background-image: url(import.svg);
+}
+
+.bar > .export {
+    background-image: url(export.svg);
+}
+
+.content {
+    flex: 1;
+    padding: 1em;
+    overflow: hidden auto;
+    display: flex;
+    flex-direction: column;
+    gap: .75em;
+}
+
+.content > div {
+    display: flex;
+    align-items: center;
+    gap: .75em;
+}
+
+.content > div > input {
+    flex: 1;
+}

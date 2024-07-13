@@ -1,27 +1,45 @@
-﻿.bar > .share-info, .content {
+﻿.bar > .info, .content {
     transition: .2s;
 }
 
-.bar > .share-info {
+.bar > .info {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1.25em;
     overflow: hidden;
-    margin-top: -18em;
+    margin-top: -17.75em;
     padding: 0;
 }
 
-.bar > .share-info.visible {
+.bar > .info.visible {
     margin-top: 0;
     padding: 1em;
 }
 
-.bar > .share-info.visible + .content {
+.bar > .info.visible + .content {
     padding-top: 0;
 }
 
-.bar > .share-info > .qr {
+.bar > .info > .edit {
+    background-image: url(edit.svg);
+    position: absolute;
+    align-self: flex-end;
+    margin: 2.5em -.5em 0 0;
+}
+
+.bar > .info > .close {
+    background-image: url(close.svg);
+    position: absolute;
+    align-self: flex-end;
+    margin: -.5em -.5em 0 0;
+}
+
+.bar > .info > .button:not(:active) {
+    background-color: #0009;
+}
+
+.bar > .info > .qr {
     width: 15em;
     aspect-ratio: 1;
     background-repeat: no-repeat;
@@ -29,7 +47,7 @@
     background-size: contain;
 }
 
-.bar > .share-info > .secret {
+.bar > .info > .secret {
     text-align: center;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -41,25 +59,17 @@
     align-items: center;
     padding: 1em .5em .5em;
     gap: .5em;
+    position: relative;
 }
 
 .bar > .content > .button {
-    background-repeat: no-repeat;
-    background-size: 1.5em;
-    background-position: center;
-    width: 2.5em;
-    aspect-ratio: 1;
-    cursor: pointer;
-    border-radius: 50%;
     flex: 0 0 auto;
 }
 
-.bar > .content > .button:active {
-    background-color: #fff3;
-}
-
-.bar > .content > .share {
-    background-image: url(share.svg);
+.bar > .content > .info {
+    position: absolute;
+    background-image: url(info.svg);
+    right: 3.25em;
 }
 
 .bar > .content > .otp {
@@ -94,16 +104,8 @@
     rotate: -90deg;
 }
 
-.bar > .content > .add {
-    background-image: url(add.svg);
-}
-
-.bar > .content > .import {
-    background-image: url(import.svg);
-}
-
-.bar > .content > .export {
-    background-image: url(export.svg);
+.bar > .content > .tools {
+    background-image: url(tools.svg);
 }
 
 .items {

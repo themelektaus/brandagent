@@ -22,6 +22,38 @@
                 margin: 0;
                 background: linear-gradient(#422, #113);
             }
+            h1:focus {
+                outline: none;
+            }
+            input {
+                padding: .5em;
+                background: none;
+                border: .125em solid #9999;
+                border-radius: .5em;
+                font-family: Rubik;
+                font-size: 1em;
+                color: white;
+                outline: none;
+                min-width: 0;
+            }
+            input:not([readonly]):focus {
+                border-color: #999;
+            }
+            input[readonly] {
+                background-color: #9993;
+            }
+            .button {
+                background-repeat: no-repeat;
+                background-size: 1.5em;
+                background-position: center;
+                width: 2.5em;
+                aspect-ratio: 1;
+                cursor: pointer;
+                border-radius: 50%;
+            }
+            .button:active {
+                background-color: #fff4;
+            }
         </style>
         <script src="script.js"></script>
     </head>

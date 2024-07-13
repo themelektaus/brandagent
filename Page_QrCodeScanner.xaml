@@ -14,8 +14,6 @@
             </c:CameraBarcodeReaderView>
         </VerticalStackLayout>
         <Label FlexLayout.Grow="1" />
-        <!--Button x:Name="AddButton" Text="Add" Clicked="AddButton_Clicked" Margin="10,5,10,0"/-->
-        <!--Button x:Name="ClearButton" Text="Clear" Clicked="ClearButton_Clicked" Margin="10,5,10,0"/-->
         <Button x:Name="CloseButton" Text="Close" Clicked="CloseButton_Clicked" Margin="10,5,10,10"/>
     </FlexLayout>
 </ContentPage>

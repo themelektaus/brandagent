@@ -1,0 +1,53 @@
+﻿@page "/edit"
+
+<div class="bar">
+    <div class="button back" @onclick="Back_OnClick"></div>
+    <div style="flex: 1; "></div>
+    <div class="button save" @onclick="Save_OnClick"></div>
+    <div class="button delete" @onclick="Delete_OnClick"></div>
+</div>
+
+<div class="content">
+    @if (Selection.ActiveDataItem is not null)
+    {
+        <div>
+            <label>Service</label>
+            <input @bind="Selection.ActiveDataItem.service" />
+        </div>
+        <div>
+            <label>Name</label>
+            <input @bind="Selection.ActiveDataItem.name" />
+        </div>
+        <div>
+            <label>Secret</label>
+            <input value="@Selection.ActiveDataItem.secret" readonly />
+        </div>
+        <div>
+            <label>Totp</label>
+            <input value="@Selection.ActiveDataItem.totp" readonly />
+        </div>
+    }
+</div>
+
+@inject NavigationManager nav
+
+@code {
+
+    void Back_OnClick()
+    {
+        nav.NavigateTo("/");
+    }
+
+    async Task Save_OnClick()
+    {
+        await Selection.data.SaveAsync();
+        Back_OnClick();
+    }
+
+    async Task Delete_OnClick()
+    {
+        Selection.data.items.RemoveAll(x => x.secret == Selection.activeSecret);
+        await Save_OnClick();
+    }
+
+}
