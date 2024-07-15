@@ -69,8 +69,8 @@
                 Selection.ComputeActiveDataItem();
                 await InvokeAsync(StateHasChanged);
                 await timerComponent.RenderAsync();
-                for (var i = 0; i < 10 && !disposed && !forceRender; i++)
-                    await Task.Delay(40);
+                for (var i = 0; i < 20 && !disposed && !forceRender; i++)
+                    await Task.Delay(50);
                 forceRender = false;
             }
 
