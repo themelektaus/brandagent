@@ -1,15 +1,34 @@
 ﻿@page "/tools"
 
 <div class="bar">
-    <div class="button back" @onclick="Back_OnClick"></div>
-    <div style="flex: 1; "></div>
-    <div class="button add" @onclick="Add_OnClick"></div>
-    <div class="button import" @onclick="Import_OnClick"></div>
-    <div class="button export" @onclick="Export_OnClick"></div>
+    <div class="button"
+         style="--icon:url(back.svg)"
+         @onclick="Back_OnClick"></div>
 </div>
 
 <div class="content">
-    <h1>Colors</h1>
+    <h2>Tools</h2>
+    <div style="display: flex; justify-content: center; ">
+        <div class="button with-text"
+             style="--icon:url(add.svg)"
+             @onclick="Add_OnClick">
+            Scan QR-Code
+        </div>
+    </div>
+    <div style="display: flex; justify-content: center; ">
+        <div class="button with-text"
+             style="--icon:url(import.svg)"
+            @onclick="Import_OnClick">
+            Import
+        </div>
+        <div class="button with-text"
+             style="--icon:url(export.svg)"
+            @onclick="Export_OnClick">
+            Export
+        </div>
+    </div>
+
+    <h2>Colors</h2>
     @for (var i = 0; i < Selection.data.colors.Count; i++)
     {
         var index = i;
@@ -17,10 +36,15 @@
         <div>
             <input @bind="color.name" />
             <input @bind="color.value" />
-            <div class="button close" @onclick="() => DeleteColor(index)"></div>
+            <div class="color" style="background-color: @color.value; "></div>
+            <div class="button"
+                 style="--icon:url(close.svg)"
+                 @onclick="() => DeleteColor(index)"></div>
         </div>
     }
-    <div class="button add" @onclick="AddColor" style="align-self: center; "></div>
+    <div class="button"
+         style="align-self:center;--icon:url(add.svg)"
+         @onclick="AddColor"></div>
 </div>
 
 @using Microsoft.Maui.Storage
@@ -43,30 +67,6 @@
         nav.NavigateTo("/");
     }
 
-    void Add_OnClick()
-    {
-        var page = new Page_QrCodeScanner();
-
-        page.Disappearing += async (sender, e) =>
-        {
-            if (page.ShouldClear)
-            {
-                Selection.data.items.Clear();
-                await Selection.data.SaveAsync();
-                return;
-            }
-
-            if (page.Item is not null)
-            {
-                Selection.data.items.Add(page.Item);
-                await Selection.data.SaveAsync();
-                return;
-            }
-        };
-
-        App.Current.MainPage.Navigation.PushModalAsync(page);
-    }
-
     async Task Import_OnClick()
     {
         var result = await FilePicker.Default.PickAsync();
@@ -84,13 +84,15 @@
     {
         string path = null;
 
-        var downloadPath = Utils.GetDownloadFolder();
+        var downloadPath = PlatformUtils.GetDownloadFolder();
 
         while (path is null)
         {
+            var ticks = DateTime.Now.Ticks;
+
             var _path = Path.Combine(
                 downloadPath,
-                $"data-{DateTime.Now.Ticks}.json"
+                $"data-{ticks}.json"
             );
 
             if (File.Exists(_path))
@@ -103,6 +105,35 @@
         }
 
         await Selection.data.SaveAsync(path);
+    }
+
+    void Add_OnClick()
+    {
+        var page = new Page_QrCodeScanner();
+
+        page.Disappearing += async (sender, e) =>
+        {
+            var dirty = false;
+
+            if (page.ShouldClear)
+            {
+                Selection.data.items.Clear();
+                dirty = true;
+            }
+
+            if (page.Item is not null)
+            {
+                Selection.data.Add(page.Item);
+                dirty = true;
+            }
+
+            if (dirty)
+            {
+                await Selection.data.SaveAsync();
+            }
+        };
+
+        Utils.Navigation.PushModalAsync(page);
     }
 
     void DeleteColor(int index)

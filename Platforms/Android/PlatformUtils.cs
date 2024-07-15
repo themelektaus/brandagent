@@ -2,7 +2,7 @@
 
 namespace Brandagent;
 
-public static class Utils
+public static class PlatformUtils
 {
     public static string GetDownloadFolder()
     {

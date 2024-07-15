@@ -2,31 +2,33 @@
 
 <div class="bar">
     <div class="@Info_GetStyleClass()">
-        <div class="button edit" @onclick="Edit_OnClick"></div>
-        <div class="button close" @onclick="() => visible = false"></div>
-        <div class="qr" style="@(visible ? Selection.ActiveDataItem?.GenerateQrStyle() : "")"></div>
-        <div class="secret">@Selection.ActiveDataItem?.secret</div>
+        <div class="button"
+             style="--icon:url(edit.svg)"
+             @onclick="Edit_OnClick"></div>
+        <div class="button"
+             style="--icon:url(close.svg)"
+             @onclick="ToggleInfo"></div>
+        <div class="qr" style="background-image: url(@Selection.ActiveDataItem?.qr); "></div>
     </div>
     <div class="content">
-        <div class="timer">
-            <canvas @ref="timerCanvas" width="42" height="42"></canvas>
-            <span>@Selection.ActiveDataItemTimer</span>
-        </div>
-        <div class="otp" @onclick="Otp_OnClick">
-            @Selection.ActiveDataItemOtp
-        </div>
+        <TimerComponent @ref="timerComponent" Value="@Selection.ActiveDataItemTimer" />
+        <OtpComponent @ref="otpComponent" Values="@Selection.ActiveDataItemOtps" />
         @if (Selection.ActiveDataItem is not null && !visible)
         {
-            <div class="button info" @onclick="() => visible = true"></div>
+            <div class="button"
+                 style="--icon:url(info.svg); position: absolute; right: 3.25em; "
+                 @onclick="ToggleInfo"></div>
         }
-        <div class="button tools" @onclick="Tools_OnClick"></div>
+        <div class="button"
+             style="--icon:url(tools.svg)"
+             @onclick="Tools_OnClick"></div>
     </div>
 </div>
 <div class="items">
     @foreach (var item in EnumerateItems())
     {
         <div class="@Item_GetStyleClass(item)"
-             style="@item.GetStyle(Selection.data.colors)"
+             style="@Item_GetAdditionalStyle(item)"
              @onclick="() => Item_OnClick(item)">
             <div class="service" data-type="@item.service"></div>
             <div class="name">@item.name</div>
@@ -36,19 +38,18 @@
 
 @implements IDisposable
 
-@inject IJSRuntime js
 @inject NavigationManager nav
-
-@using Microsoft.Maui.ApplicationModel.DataTransfer
 
 @code {
 
-    ElementReference timerCanvas;
+    TimerComponent timerComponent;
+    OtpComponent otpComponent;
 
     bool visible;
 
     Task intervalTask;
     bool disposed;
+    bool forceRender;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -58,25 +59,22 @@
             return;
 
         Selection.data = await Data.LoadAsync();
+        if (Selection.ActiveDataItem is null)
+            Selection.activeSecret = EnumerateItems().FirstOrDefault()?.secret;
 
         intervalTask = Task.Run(async () =>
         {
             while (!disposed)
             {
                 Selection.ComputeActiveDataItem();
-
-                await js.InvokeVoidAsync(
-                    "renderCircle",
-                    new object[] {
-                        timerCanvas,
-                        Selection.ActiveDataItemTimer / 30f,
-                        5
-                    }
-                );
-
                 await InvokeAsync(StateHasChanged);
-                await Task.Delay(1000);
+                await timerComponent.RenderAsync();
+                for (var i = 0; i < 10 && !disposed && !forceRender; i++)
+                    await Task.Delay(40);
+                forceRender = false;
             }
+
+            Selection.ClearActiveDataItem();
         });
     }
 
@@ -104,15 +102,29 @@
         return "info" + (visible ? " visible" : "");
     }
 
+    void ToggleInfo()
+    {
+        visible = !visible;
+    }
+
     string Item_GetStyleClass(Data.Item item)
     {
         return $"item" + (item == Selection.ActiveDataItem ? " active" : "");
     }
 
+    string Item_GetAdditionalStyle(Data.Item item)
+    {
+        var color = Selection.data.colors.FirstOrDefault(x => x.name == item.service);
+        if (color is null)
+            return string.Empty;
+
+        return $"background-color: {color.value}; ";
+    }
+
     void Item_OnClick(Data.Item item)
     {
         Selection.activeSecret = item.secret;
-        Selection.ComputeActiveDataItem();
+        forceRender = true;
     }
 
     void Edit_OnClick()
@@ -123,12 +135,6 @@
     void Tools_OnClick()
     {
         nav.NavigateTo("/tools");
-    }
-
-    async Task Otp_OnClick()
-    {
-        if (Selection.ActiveDataItem is not null)
-            await Clipboard.Default.SetTextAsync(Selection.ActiveDataItemOtp);
     }
 
 }

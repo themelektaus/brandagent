@@ -1,0 +1,22 @@
+﻿<div class="timer">
+    <canvas @ref="canvas" width="100" height="100"></canvas>
+    <span>@Value</span>
+</div>
+
+@inject IJSRuntime js
+
+@code {
+
+    [Parameter] public int Value { get; set; }
+
+    ElementReference canvas;
+
+    public async Task RenderAsync()
+    {
+        await js.InvokeVoidAsync(
+            "renderCircle",
+            new object[] { canvas, Value / 30f, 10, "#9cf" }
+        );
+    }
+
+}

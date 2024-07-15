@@ -28,7 +28,7 @@
             input {
                 padding: .5em;
                 background: none;
-                border: .125em solid #9999;
+                border: .125em solid #9996;
                 border-radius: .5em;
                 font-family: Rubik;
                 font-size: 1em;
@@ -45,14 +45,25 @@
             .button {
                 background-repeat: no-repeat;
                 background-size: 1.5em;
+                background-image: var(--icon, none);
+                cursor: pointer;
+            }
+            .button:not(.with-text) {
                 background-position: center;
                 width: 2.5em;
                 aspect-ratio: 1;
-                cursor: pointer;
                 border-radius: 50%;
             }
             .button:active {
                 background-color: #fff4;
+            }
+            .button.with-text {
+                background-position: 1em 50%;
+                height: 2em;
+                line-height: 2em;
+                border-radius: .5em;
+                justify-content: center;
+                padding: .5em 1em .5em 3em;
             }
         </style>
         <script src="script.js"></script>

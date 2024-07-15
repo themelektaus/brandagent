@@ -1,10 +1,13 @@
 ﻿@page "/edit"
 
 <div class="bar">
-    <div class="button back" @onclick="Back_OnClick"></div>
+    <div class="button"
+         style="--icon:url(back.svg)"
+         @onclick="Back_OnClick"></div>
     <div style="flex: 1; "></div>
-    <div class="button save" @onclick="Save_OnClick"></div>
-    <div class="button delete" @onclick="Delete_OnClick"></div>
+    <div class="button"
+         style="--icon:url(delete.svg)"
+         @onclick="Delete_OnClick"></div>
 </div>
 
 <div class="content">
@@ -29,25 +32,26 @@
     }
 </div>
 
+@implements IAsyncDisposable
+
 @inject NavigationManager nav
 
 @code {
+
+    public async ValueTask DisposeAsync()
+    {
+        await Selection.data.SaveAsync();
+    }
 
     void Back_OnClick()
     {
         nav.NavigateTo("/");
     }
 
-    async Task Save_OnClick()
-    {
-        await Selection.data.SaveAsync();
-        Back_OnClick();
-    }
-
-    async Task Delete_OnClick()
+    void Delete_OnClick()
     {
         Selection.data.items.RemoveAll(x => x.secret == Selection.activeSecret);
-        await Save_OnClick();
+        Back_OnClick();
     }
 
 }

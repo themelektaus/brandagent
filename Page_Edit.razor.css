@@ -4,18 +4,6 @@
     gap: .5em;
 }
 
-.bar > .back {
-    background-image: url(back.svg);
-}
-
-.bar > .save {
-    background-image: url(save.svg);
-}
-
-.bar > .delete {
-    background-image: url(delete.svg);
-}
-
 .content {
     flex: 1;
     padding: 1em 1em 3em;

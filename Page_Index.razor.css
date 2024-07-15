@@ -8,7 +8,7 @@
     align-items: center;
     gap: 1.25em;
     overflow: hidden;
-    margin-top: -17.75em;
+    margin-top: -15.5em;
     padding: 0;
 }
 
@@ -21,22 +21,21 @@
     padding-top: 0;
 }
 
-.bar > .info > .edit {
-    background-image: url(edit.svg);
+.bar > .info > .button {
     position: absolute;
     align-self: flex-end;
-    margin: 2.5em -.5em 0 0;
-}
-
-.bar > .info > .close {
-    background-image: url(close.svg);
-    position: absolute;
-    align-self: flex-end;
-    margin: -.5em -.5em 0 0;
 }
 
 .bar > .info > .button:not(:active) {
     background-color: #0009;
+}
+
+.bar > .info > .button:nth-child(1) {
+    margin: 2.5em -.5em 0 0;
+}
+
+.bar > .info > .button:nth-child(2) {
+    margin: -.5em -.5em 0 0;
 }
 
 .bar > .info > .qr {
@@ -47,65 +46,16 @@
     background-size: contain;
 }
 
-.bar > .info > .secret {
-    text-align: center;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    height: 1em;
-}
-
 .bar > .content {
     display: flex;
-    align-items: center;
     padding: 1em .5em .5em;
     gap: .5em;
     position: relative;
+    align-items: flex-start;
 }
 
 .bar > .content > .button {
     flex: 0 0 auto;
-}
-
-.bar > .content > .info {
-    position: absolute;
-    background-image: url(info.svg);
-    right: 3.25em;
-}
-
-.bar > .content > .otp {
-    font-size: 2em;
-    height: 1.125em;
-    cursor: pointer;
-    flex: 1;
-    display: flex;
-    justify-content: center;
-    white-space: nowrap;
-    overflow: hidden;
-}
-
-.bar > .content > .timer {
-    flex: 0 0 auto;
-    width: 2.5em;
-    height: 2.5em;
-    position: relative;
-    display: flex;
-}
-
-.bar > .content > .timer > * {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.bar > .content > .timer > canvas {
-    rotate: -90deg;
-}
-
-.bar > .content > .tools {
-    background-image: url(tools.svg);
 }
 
 .items {

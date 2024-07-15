@@ -10,20 +10,25 @@ public static class Selection
     public static Data.Item ActiveDataItem
         => data?.items.FirstOrDefault(x => x.secret == activeSecret);
 
-    public static string ActiveDataItemOtp { get; private set; }
+    public static string[] ActiveDataItemOtps { get; private set; }
     public static int ActiveDataItemTimer { get; private set; }
+
+    public static void ClearActiveDataItem()
+    {
+        ActiveDataItemOtps = [];
+        ActiveDataItemTimer = 0;
+    }
 
     public static void ComputeActiveDataItem()
     {
         if (ActiveDataItem is null)
         {
-            ActiveDataItemOtp = null;
-            ActiveDataItemTimer = 0;
+            ClearActiveDataItem();
             return;
         }
 
-        ActiveDataItem.Compute(out var otp, out var timer);
-        ActiveDataItemOtp = otp;
+        ActiveDataItem.Compute(out var otps, out var timer);
+        ActiveDataItemOtps = otps;
         ActiveDataItemTimer = timer;
     }
 }

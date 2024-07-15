@@ -1,5 +1,5 @@
 ﻿
-function renderCircle($canvas, v, lineWidth)
+function renderCircle($canvas, v, lineWidth, color)
 {
     const ctx = $canvas.getContext('2d')
     ctx.clearRect(0, 0, $canvas.width, $canvas.height)
@@ -11,12 +11,12 @@ function renderCircle($canvas, v, lineWidth)
     ctx.beginPath()
     ctx.arc(r, r, r - l, 0, p)
     ctx.lineWidth = lineWidth
-    ctx.strokeStyle = "#99c4"
+    ctx.strokeStyle = `${color}4`
     ctx.stroke()
 
     ctx.beginPath()
     ctx.arc(r, r, r - l, p * (1 - v), p)
-    ctx.lineWidth = lineWidth / 4
-    ctx.strokeStyle = "#9cf"
+    ctx.lineWidth = lineWidth / 2
+    ctx.strokeStyle = `${color}f`
     ctx.stroke()
 }

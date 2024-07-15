@@ -42,7 +42,10 @@
       <Compile Update="App_MainPage.xaml.cs">
         <DependentUpon>App_MainPage.xaml</DependentUpon>
       </Compile>
-      <Compile Update="Platforms\Windows\Utils.cs">
+      <Compile Update="Platforms\Windows\PlatformUtils.cs">
+        <ExcludeFromCurrentConfiguration>false</ExcludeFromCurrentConfiguration>
+      </Compile>
+      <Compile Update="Utils.cs">
         <ExcludeFromCurrentConfiguration>false</ExcludeFromCurrentConfiguration>
       </Compile>
     </ItemGroup>

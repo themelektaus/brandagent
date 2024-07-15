@@ -7,26 +7,25 @@ using Microsoft.Maui.Hosting;
 using ZXing.Net.Maui.Controls;
 
 namespace Brandagent
+;
+public static class MauiProgram
 {
-    public static class MauiProgram
+    public static MauiApp CreateMauiApp()
     {
-        public static MauiApp CreateMauiApp()
-        {
-            var builder = MauiApp
-                .CreateBuilder()
-                .UseMauiApp<App>()
-                .UseBarcodeReader();
+        var builder = MauiApp
+            .CreateBuilder()
+            .UseMauiApp<App>()
+            .UseBarcodeReader();
 
-            var services = builder.Services;
+        var services = builder.Services;
 
-            services.AddMauiBlazorWebView();
+        services.AddMauiBlazorWebView();
 
 #if DEBUG
-            services.AddBlazorWebViewDeveloperTools();
-            builder.Logging.AddDebug();
+        services.AddBlazorWebViewDeveloperTools();
+        builder.Logging.AddDebug();
 #endif
 
-            return builder.Build();
-        }
+        return builder.Build();
     }
 }

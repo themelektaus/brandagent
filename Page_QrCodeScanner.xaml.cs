@@ -32,8 +32,8 @@ public partial class Page_QrCodeScanner : ContentPage
 
             var parameters = System.Web.HttpUtility.ParseQueryString(url[1]);
 
-            var secret = parameters.Get("secret") ?? string.Empty;
-            if (secret == string.Empty)
+            var secret = parameters.Get("secret");
+            if (Utils.IsEmpty(secret))
                 continue;
 
             Item = new()
@@ -48,14 +48,14 @@ public partial class Page_QrCodeScanner : ContentPage
         }
     }
 
-    void CloseButton_Clicked(object sender, EventArgs e)
+    void CancelButton_Clicked(object sender, EventArgs e)
     {
         Close();
     }
 
     static void Close()
     {
-        App.Current.MainPage.Navigation.PopModalAsync();
+        Utils.Navigation.PopModalAsync();
     }
 
 }
