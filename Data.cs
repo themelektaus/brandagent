@@ -11,11 +11,62 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Threading.Tasks;
+using Windows.Media.Core;
 
 namespace Brandagent;
 
 public class Data
 {
+    public bool showNextOtp;
+
+    public class Color
+    {
+        public string name;
+        public string value;
+    }
+
+    public List<Color> colors = new();
+
+    public class Item : IJsonOnDeserialized
+    {
+        public string service;
+        public string name;
+        public string secret;
+        public string totp;
+        public bool hidden;
+
+        [JsonIgnore] public string qr;
+
+        public void OnDeserialized()
+        {
+            qr = "data:image/png;base64," + Convert.ToBase64String(
+                PngByteQRCodeHelper.GetQRCode(totp, QRCodeGenerator.ECCLevel.M, 6)
+            );
+        }
+
+        public void Compute(out string currentOtp, out string nextOtp, out int timer)
+        {
+            try
+            {
+                var secretKey = Base32Encoding.ToBytes(secret);
+
+                var totp = new Totp(secretKey);
+                currentOtp = totp.ComputeTotp().Insert(3, " ");
+                timer = totp.RemainingSeconds();
+
+                totp = new Totp(secretKey, timeCorrection: new(DateTime.UtcNow.AddSeconds(30)));
+                nextOtp = totp.ComputeTotp().Insert(3, " ");
+            }
+            catch
+            {
+                currentOtp = null;
+                nextOtp = null;
+                timer = 0;
+            }
+        }
+    }
+    public List<Item> items = new();
+
     readonly static JsonSerializerOptions jsonOptions = new()
     {
         WriteIndented = true,
@@ -117,55 +168,4 @@ public class Data
     {
         return JsonSerializer.Serialize(this, jsonOptions);
     }
-
-    public class Color
-    {
-        public string name;
-        public string value;
-    }
-
-    public List<Color> colors = new();
-
-    public class Item : IJsonOnDeserialized
-    {
-        public string service;
-        public string name;
-        public string secret;
-        public string totp;
-        public bool hidden;
-
-        [JsonIgnore] public string qr;
-
-        public void OnDeserialized()
-        {
-            qr = "data:image/png;base64," + Convert.ToBase64String(
-                PngByteQRCodeHelper.GetQRCode(totp, QRCodeGenerator.ECCLevel.M, 6)
-            );
-        }
-
-        public void Compute(out string[] otps, out int timer)
-        {
-            timer = 0;
-
-            try
-            {
-                var secretKey = Base32Encoding.ToBytes(secret);
-
-                otps = new string[3];
-                
-                for (var i = -1; i <= 1; i++)
-                {
-                    var totp = new Totp(secretKey, timeCorrection: new(DateTime.UtcNow.AddSeconds(30 * i)));
-                    otps[i + 1] = totp.ComputeTotp().Insert(3, " ");
-                    if (i == 0)
-                        timer = totp.RemainingSeconds();
-                }
-            }
-            catch
-            {
-                otps = [];
-            }
-        }
-    }
-    public List<Item> items = new();
 }

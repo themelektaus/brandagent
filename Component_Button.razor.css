@@ -1,0 +1,25 @@
+﻿.button {
+    background-repeat: no-repeat;
+    background-size: 1.5em;
+    cursor: pointer;
+}
+
+.button:not(.with-text) {
+    background-position: center;
+    width: 2.5em;
+    aspect-ratio: 1;
+    border-radius: 50%;
+}
+
+.button:active {
+    background-color: #fff4;
+}
+
+.button.with-text {
+    background-position: 1em 50%;
+    height: 2em;
+    line-height: 2em;
+    border-radius: .5em;
+    justify-content: center;
+    padding: .5em 1em .5em 3em;
+}

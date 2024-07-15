@@ -2,26 +2,20 @@
 
 <div class="bar">
     <div class="@Info_GetStyleClass()">
-        <div class="button"
-             style="--icon:url(edit.svg)"
-             @onclick="Edit_OnClick"></div>
-        <div class="button"
-             style="--icon:url(close.svg)"
-             @onclick="ToggleInfo"></div>
+        <Component_Button Icon="edit" OnClick="Edit_OnClick" Style="position: absolute; align-self: flex-end; margin: 2.5em -.5em 0 0; " />
+        <Component_Button Icon="close" OnClick="ToggleInfo" Style="position: absolute; align-self: flex-end; margin: -.5em -.5em 0 0; " />
         <div class="qr" style="background-image: url(@Selection.ActiveDataItem?.qr); "></div>
     </div>
     <div class="content">
-        <TimerComponent @ref="timerComponent" Value="@Selection.ActiveDataItemTimer" />
-        <OtpComponent @ref="otpComponent" Values="@Selection.ActiveDataItemOtps" />
+        <Component_Timer @ref="timerComponent" Value="@Selection.ActiveDataItemTimer" />
+        <Component_Otp Current="@Selection.ActiveDataItemCurrentOtp"
+                       Next="@((Selection.data?.showNextOtp ?? false) ? Selection.ActiveDataItemNextOtp : null)" />
         @if (Selection.ActiveDataItem is not null && !visible)
         {
-            <div class="button"
-                 style="--icon:url(info.svg); position: absolute; right: 3.25em; "
-                 @onclick="ToggleInfo"></div>
+            <Component_Button Icon="info" OnClick="ToggleInfo"
+                              Style="position: absolute; right: 3.25em; " />
         }
-        <div class="button"
-             style="--icon:url(tools.svg)"
-             @onclick="Tools_OnClick"></div>
+        <Component_Button Icon="tools" OnClick="Tools_OnClick" />
     </div>
 </div>
 <div class="items">
@@ -42,8 +36,7 @@
 
 @code {
 
-    TimerComponent timerComponent;
-    OtpComponent otpComponent;
+    Component_Timer timerComponent;
 
     bool visible;
 

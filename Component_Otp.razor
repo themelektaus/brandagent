@@ -1,0 +1,22 @@
+﻿<div class="otp" @onclick="Otp_OnClick">
+    <div class="current">@Current</div>
+    @if (!Utils.IsEmpty(Next))
+    {
+        <div class="next">@Next</div>
+    }
+</div>
+
+@using Microsoft.Maui.ApplicationModel.DataTransfer
+
+@code {
+
+    [Parameter] public string Current { get; set; }
+    [Parameter] public string Next { get; set; }
+
+    async Task Otp_OnClick()
+    {
+        if (!Utils.IsEmpty(Current))
+            await Clipboard.Default.SetTextAsync(Current);
+    }
+
+}

@@ -1,5 +1,8 @@
-﻿.bar > .info, .content {
-    transition: .2s;
+﻿.bar {
+    flex-direction: column;
+    padding: 0;
+    box-shadow: 0 0 .75em -.25em black;
+    z-index: 1;
 }
 
 .bar > .info {
@@ -8,34 +11,13 @@
     align-items: center;
     gap: 1.25em;
     overflow: hidden;
-    margin-top: -15.5em;
-    padding: 0;
+    margin-top: -17.5em;
+    padding: 1.5em 1em 0;
+    transition: .2s;
 }
 
 .bar > .info.visible {
     margin-top: 0;
-    padding: 1em;
-}
-
-.bar > .info.visible + .content {
-    padding-top: 0;
-}
-
-.bar > .info > .button {
-    position: absolute;
-    align-self: flex-end;
-}
-
-.bar > .info > .button:not(:active) {
-    background-color: #0009;
-}
-
-.bar > .info > .button:nth-child(1) {
-    margin: 2.5em -.5em 0 0;
-}
-
-.bar > .info > .button:nth-child(2) {
-    margin: -.5em -.5em 0 0;
 }
 
 .bar > .info > .qr {
@@ -61,6 +43,7 @@
 .items {
     flex: 1;
     overflow: hidden scroll;
+    padding: .5em 0;
 }
 
 .item {

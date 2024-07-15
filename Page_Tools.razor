@@ -1,31 +1,23 @@
 ﻿@page "/tools"
 
 <div class="bar">
-    <div class="button"
-         style="--icon:url(back.svg)"
-         @onclick="Back_OnClick"></div>
+    <Component_Button Icon="back" OnClick="Back_OnClick" />
 </div>
 
 <div class="content">
-    <h2>Tools</h2>
+    <h2>Settings</h2>
+    <div style="display: flex; justify-content: center; margin: 0 1em; ">
+        <input type="checkbox" @bind="Selection.data.showNextOtp" style="flex: 0 0 1.25em; aspect-ratio: 1; " />
+        <label style="flex: 1; ">Show next password</label>
+    </div>
+
+    <h2>Data</h2>
     <div style="display: flex; justify-content: center; ">
-        <div class="button with-text"
-             style="--icon:url(add.svg)"
-             @onclick="Add_OnClick">
-            Scan QR-Code
-        </div>
+        <Component_Button Icon="add" Text="Scan QR Code" OnClick="Add_OnClick" />
     </div>
     <div style="display: flex; justify-content: center; ">
-        <div class="button with-text"
-             style="--icon:url(import.svg)"
-            @onclick="Import_OnClick">
-            Import
-        </div>
-        <div class="button with-text"
-             style="--icon:url(export.svg)"
-            @onclick="Export_OnClick">
-            Export
-        </div>
+        <Component_Button Icon="import" Text="Import" OnClick="Import_OnClick" />
+        <Component_Button Icon="export" Text="Export" OnClick="Export_OnClick" />
     </div>
 
     <h2>Colors</h2>
@@ -37,14 +29,10 @@
             <input @bind="color.name" />
             <input @bind="color.value" />
             <div class="color" style="background-color: @color.value; "></div>
-            <div class="button"
-                 style="--icon:url(close.svg)"
-                 @onclick="() => DeleteColor(index)"></div>
+            <Component_Button Icon="close" OnClick="() => DeleteColor(index)" />
         </div>
     }
-    <div class="button"
-         style="align-self:center;--icon:url(add.svg)"
-         @onclick="AddColor"></div>
+    <Component_Button Icon="close" OnClick="AddColor" Style="align-self: center; " />
 </div>
 
 @using Microsoft.Maui.Storage

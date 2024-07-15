@@ -1,6 +1,5 @@
 ﻿.otp {
     font-size: 2.5em;
-    height: 2em;
     cursor: pointer;
     flex: 1;
     display: flex;
@@ -9,10 +8,14 @@
     white-space: nowrap;
     overflow: hidden;
     line-height: 1;
+    height: 1em;
 }
 
-.otp > :first-child,
-.otp > :last-child {
+.otp:has(.next) {
+    height: 1.5em;
+}
+
+.otp .next {
     font-size: .5em;
     opacity: .5;
 }

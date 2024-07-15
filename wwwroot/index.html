@@ -5,67 +5,8 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
         <title>Brandagent</title>
         <base href="/" />
+        <link href="style.css" rel="stylesheet" />
         <link href="Brandagent.styles.css" rel="stylesheet" />
-        <style>
-            @font-face {
-                font-family: Rubik;
-                src: url(rubik.ttf);
-            }
-            html {
-                -webkit-tap-highlight-color: transparent;
-            }
-            html, body, #app, main {
-                height: 100dvh;
-            }
-            body {
-                font-family: Rubik;
-                margin: 0;
-                background: linear-gradient(#422, #113);
-            }
-            h1:focus {
-                outline: none;
-            }
-            input {
-                padding: .5em;
-                background: none;
-                border: .125em solid #9996;
-                border-radius: .5em;
-                font-family: Rubik;
-                font-size: 1em;
-                color: white;
-                outline: none;
-                min-width: 0;
-            }
-            input:not([readonly]):focus {
-                border-color: #999;
-            }
-            input[readonly] {
-                background-color: #9993;
-            }
-            .button {
-                background-repeat: no-repeat;
-                background-size: 1.5em;
-                background-image: var(--icon, none);
-                cursor: pointer;
-            }
-            .button:not(.with-text) {
-                background-position: center;
-                width: 2.5em;
-                aspect-ratio: 1;
-                border-radius: 50%;
-            }
-            .button:active {
-                background-color: #fff4;
-            }
-            .button.with-text {
-                background-position: 1em 50%;
-                height: 2em;
-                line-height: 2em;
-                border-radius: .5em;
-                justify-content: center;
-                padding: .5em 1em .5em 3em;
-            }
-        </style>
         <script src="script.js"></script>
     </head>
     <body>

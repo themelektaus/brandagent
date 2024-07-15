@@ -1,13 +1,9 @@
 ﻿@page "/edit"
 
 <div class="bar">
-    <div class="button"
-         style="--icon:url(back.svg)"
-         @onclick="Back_OnClick"></div>
+    <Component_Button Icon="back" OnClick="Back_OnClick" />
     <div style="flex: 1; "></div>
-    <div class="button"
-         style="--icon:url(delete.svg)"
-         @onclick="Delete_OnClick"></div>
+    <Component_Button Icon="delete" OnClick="Delete_OnClick" />
 </div>
 
 <div class="content">

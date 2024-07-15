@@ -1,0 +1,48 @@
+﻿@font-face {
+    font-family: Rubik;
+    src: url(rubik.ttf);
+}
+
+html {
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body, #app, main {
+    height: 100dvh;
+}
+
+body {
+    font-family: Rubik;
+    margin: 0;
+    background: linear-gradient(#422, #113);
+}
+
+h1:focus {
+    outline: none;
+}
+
+input {
+    padding: .5em;
+    background: none;
+    border: .125em solid #9996;
+    border-radius: .5em;
+    font-family: Rubik;
+    font-size: 1em;
+    color: white;
+    outline: none;
+    min-width: 0;
+}
+
+input:not([readonly]):focus {
+    border-color: #999;
+}
+
+input[readonly] {
+    background-color: #9993;
+}
+
+.bar {
+    display: flex;
+    padding: .5em;
+    gap: .5em;
+}
