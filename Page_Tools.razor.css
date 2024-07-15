@@ -1,6 +1,6 @@
 ﻿.content {
     flex: 1;
-    padding: 1em;
+    padding: 1em 1em 2em;
     overflow: hidden auto;
     display: flex;
     flex-direction: column;

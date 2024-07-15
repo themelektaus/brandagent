@@ -1,8 +1,6 @@
 ﻿.bar {
     flex-direction: column;
     padding: 0;
-    box-shadow: 0 0 .75em -.25em black;
-    z-index: 1;
 }
 
 .bar > .info {
