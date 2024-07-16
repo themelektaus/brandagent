@@ -5,7 +5,7 @@
              x:Class="Brandagent.App">
     <Application.Resources>
         <ResourceDictionary>
-            <Color x:Key="PageBackgroundColor">orange</Color>
+            <Color x:Key="PageBackgroundColor">#420</Color>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

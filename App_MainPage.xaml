@@ -4,7 +4,7 @@
              xmlns:local="clr-namespace:Brandagent"
              x:Class="Brandagent.App_MainPage"
              BackgroundColor="{DynamicResource PageBackgroundColor}">
-    <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html">
+    <BlazorWebView x:Name="blazorWebView" HostPage="wwwroot/index.html" IsVisible="False">
         <BlazorWebView.RootComponents>
             <RootComponent Selector="#app" ComponentType="{x:Type local:App_MainPage_Root}" />
         </BlazorWebView.RootComponents>
