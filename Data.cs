@@ -46,24 +46,35 @@ public class Data
             );
         }
 
-        public void Compute(out string currentOtp, out string nextOtp, out int timer)
+        public struct Context
+        {
+            public string currentOtp;
+            public string nextOtp;
+            public int timer;
+        }
+
+        public void Compute(out Context context)
         {
             try
             {
                 var secretKey = Base32Encoding.ToBytes(secret);
+                var nextTime = DateTime.UtcNow.AddSeconds(30);
 
-                var totp = new Totp(secretKey);
-                currentOtp = totp.ComputeTotp().Insert(3, " ");
-                timer = totp.RemainingSeconds();
+                Totp[] totp = [
+                    new(secretKey),
+                    new(secretKey, timeCorrection: new(nextTime))
+                ];
 
-                totp = new Totp(secretKey, timeCorrection: new(DateTime.UtcNow.AddSeconds(30)));
-                nextOtp = totp.ComputeTotp().Insert(3, " ");
+                context = new()
+                {
+                    currentOtp = totp[0].ComputeTotp().Insert(3, " "),
+                    timer = totp[0].RemainingSeconds(),
+                    nextOtp = totp[1].ComputeTotp().Insert(3, " ")
+                };
             }
             catch
             {
-                currentOtp = null;
-                nextOtp = null;
-                timer = 0;
+                context = default;
             }
         }
     }

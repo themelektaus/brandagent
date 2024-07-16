@@ -1,8 +1,8 @@
 ﻿<div class="otp" @onclick="Otp_OnClick">
-    <div class="current">@Current</div>
-    @if (!Utils.IsEmpty(Next))
+    <div class="current">@Context.currentOtp</div>
+    @if (Selection.data?.showNextOtp ?? false)
     {
-        <div class="next">@Next</div>
+        <div class="next">@Context.nextOtp</div>
     }
 </div>
 
@@ -10,13 +10,12 @@
 
 @code {
 
-    [Parameter] public string Current { get; set; }
-    [Parameter] public string Next { get; set; }
+    [Parameter] public Data.Item.Context Context { get; set; }
 
     async Task Otp_OnClick()
     {
-        if (!Utils.IsEmpty(Current))
-            await Clipboard.Default.SetTextAsync(Current);
+        if (!Utils.IsEmpty(Context.currentOtp))
+            await Clipboard.Default.SetTextAsync(Context.currentOtp);
     }
 
 }
