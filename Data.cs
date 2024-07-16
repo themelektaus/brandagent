@@ -87,7 +87,6 @@ public class Data
 
     public static async Task<Data> LoadAsync(string path)
     {
-
         if (!File.Exists(path))
         {
             return new();

@@ -3,5 +3,7 @@
 	<application android:allowBackup="true" android:icon="@mipmap/appicon"></application>
 	<uses-permission android:name="android.permission.CAMERA" />
 	<uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+	<uses-permission android:name="android.permission.USE_BIOMETRIC" />
+	<uses-permission android:name="android.permission.USE_FINGERPRINT" />
 	<uses-sdk android:targetSdkVersion="34" />
 </manifest>
