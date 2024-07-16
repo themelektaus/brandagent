@@ -1,8 +1,11 @@
-﻿<div class="button @(Utils.IsEmpty(Text) ? "" : "with-text")"
-     style="background-image: url(res/@(Icon).svg); @Style"
-     @onclick="OnClick">
-    @Text
- </div>
+﻿@if (Enabled)
+{
+    <div class="@GetStyleClass()" style="@GetStyle()" @onclick="OnClick">@Text</div>
+}
+else
+{
+    <div class="@GetStyleClass()" style="@GetStyle()">@Text</div>
+}
 
 @code {
 
@@ -10,5 +13,18 @@
     [Parameter] public string Style { get; set; }
     [Parameter] public string Text { get; set; }
     [Parameter] public EventCallback OnClick { get; set; }
+    [Parameter] public bool Enabled { get; set; } = true;
+
+    string GetStyleClass()
+    {
+        var withText = Utils.IsEmpty(Text) ? "" : "with-text";
+        var enabled = Enabled ? "enabled" : "disabled";
+        return $"button {withText} {enabled}";
+    }
+
+    string GetStyle()
+    {
+        return $"background-image: url(res/{Icon}.svg); {Style}";
+    }
 
 }

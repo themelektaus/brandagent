@@ -6,21 +6,30 @@
 
 <div class="content">
     <h2>Settings</h2>
+
     <div style="display: flex; justify-content: center; margin: 0 1em; ">
         <input type="checkbox" @bind="Selection.data.showNextOtp" style="flex: 0 0 1.25em; aspect-ratio: 1; " />
         <label style="flex: 1; ">Show next password</label>
     </div>
 
+    <div style="display: flex; justify-content: center; margin: 0 1em; ">
+        <input type="checkbox" @bind="Selection.data.useGradients" style="flex: 0 0 1.25em; aspect-ratio: 1; " />
+        <label style="flex: 1; ">Use Gradients</label>
+    </div>
+
     <h2>Data</h2>
+
     <div style="display: flex; justify-content: center; ">
         <Component_Button Icon="add" Text="Scan QR Code" OnClick="Add_OnClick" />
     </div>
+
     <div style="display: flex; justify-content: center; ">
         <Component_Button Icon="import" Text="Import" OnClick="Import_OnClick" />
         <Component_Button Icon="export" Text="Export" OnClick="Export_OnClick" />
     </div>
 
     <h2>Colors</h2>
+
     @for (var i = 0; i < Selection.data.colors.Count; i++)
     {
         var index = i;
@@ -41,7 +50,7 @@
 
 @implements IAsyncDisposable
 
-@inject NavigationManager nav
+@inject IJSRuntime js
 
 @code {
 
@@ -50,9 +59,9 @@
         await Selection.data.SaveAsync();
     }
 
-    void Back_OnClick()
+    async Task Back_OnClick()
     {
-        nav.NavigateTo("/");
+        await js.InvokeVoidAsync("history.back");
     }
 
     async Task Import_OnClick()

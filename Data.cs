@@ -16,7 +16,10 @@ namespace Brandagent;
 
 public class Data
 {
+    static readonly System.Threading.SemaphoreSlim fileLock = new(1, 1);
+
     public bool showNextOtp;
+    public bool useGradients = true;
 
     public class Color
     {
@@ -87,24 +90,31 @@ public class Data
 
     public static async Task<Data> LoadAsync(string path)
     {
-
         if (!File.Exists(path))
         {
             return new();
         }
 
+        await fileLock.WaitAsync();
+
         using var stream = File.OpenRead(path);
+
+        Data data;
 
         try
         {
-            return await JsonSerializer.DeserializeAsync<Data>(stream, jsonOptions);
+            data = await JsonSerializer.DeserializeAsync<Data>(stream, jsonOptions);
         }
         catch
         {
-            var json = await File.ReadAllTextAsync(path);
+            //var json = await File.ReadAllTextAsync(path);
 
-            return new();
+            data = new();
         }
+
+        fileLock.Release();
+
+        return data;
     }
 
     public void Add(Data data)
@@ -159,8 +169,10 @@ public class Data
 
     public async Task SaveAsync(string path)
     {
+        await fileLock.WaitAsync();
         using var stream = File.Create(path);
         await JsonSerializer.SerializeAsync(stream, this, jsonOptions);
+        fileLock.Release();
     }
 
     public string ToJson()

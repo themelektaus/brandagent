@@ -11,7 +11,7 @@
     border-radius: 50%;
 }
 
-.button:active {
+.button.enabled:active {
     background-color: #fff4;
 }
 
@@ -22,4 +22,8 @@
     border-radius: .5em;
     justify-content: center;
     padding: .5em 1em .5em 3em;
+}
+
+.button.disabled {
+    opacity: .5;
 }

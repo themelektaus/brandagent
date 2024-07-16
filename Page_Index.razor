@@ -2,20 +2,22 @@
 
 <div class="bar">
     <div class="@Info_GetStyleClass()">
-        <Component_Button Icon="edit" OnClick="Edit_OnClick" Style="position: absolute; align-self: flex-end; margin: 2.5em -.5em 0 0; " />
-        <Component_Button Icon="close" OnClick="ToggleInfo" Style="position: absolute; align-self: flex-end; margin: -.5em -.5em 0 0; " />
+        <Component_Button Icon="edit" OnClick="Edit_OnClick" Enabled="@(ready && !disposing)"
+                          Style="position: absolute; align-self: flex-end; margin: 2.5em -.5em 0 0; " />
+        <Component_Button Icon="close" OnClick="ToggleInfo" Enabled="@(ready && !disposing)"
+                          Style="position: absolute; align-self: flex-end; margin: -.5em -.5em 0 0; " />
         <div class="qr" style="background-image: url(@Selection.ActiveDataItem?.qr); "></div>
     </div>
     <div class="content">
         <Component_Timer @ref="timerComponent" Value="@Selection.ActiveDataItemTimer" />
         <Component_Otp Current="@Selection.ActiveDataItemCurrentOtp"
-                       Next="@((Selection.data?.showNextOtp ?? false) ? Selection.ActiveDataItemNextOtp : null)" />
+                       Next="@Selection.ActiveDataItemNextOtp" />
         @if (Selection.ActiveDataItem is not null && !visible)
         {
             <Component_Button Icon="info" OnClick="ToggleInfo"
                               Style="position: absolute; right: 3.25em; " />
         }
-        <Component_Button Icon="tools" OnClick="Tools_OnClick" />
+        <Component_Button Icon="tools" OnClick="Tools_OnClick" Enabled="@(ready && !disposing)" />
     </div>
 </div>
 <div class="items">
@@ -30,8 +32,6 @@
     }
 </div>
 
-@implements IDisposable
-
 @inject NavigationManager nav
 
 @code {
@@ -41,8 +41,11 @@
     bool visible;
 
     Task intervalTask;
-    bool disposed;
     bool forceRender;
+
+    bool ready;
+    bool disposing;
+    bool disposed;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -57,23 +60,24 @@
 
         intervalTask = Task.Run(async () =>
         {
-            while (!disposed)
+            while (!disposing)
             {
                 Selection.ComputeActiveDataItem();
                 await InvokeAsync(StateHasChanged);
                 await timerComponent.RenderAsync();
+                if (!ready)
+                {
+                    ready = true;
+                    await InvokeAsync(StateHasChanged);
+                }
                 for (var i = 0; i < 20 && !disposed && !forceRender; i++)
                     await Task.Delay(50);
                 forceRender = false;
             }
 
             Selection.ClearActiveDataItem();
+            disposed = true;
         });
-    }
-
-    public void Dispose()
-    {
-        disposed = true;
     }
 
     IEnumerable<Data.Item> EnumerateItems()
@@ -111,6 +115,16 @@
         if (color is null)
             return string.Empty;
 
+        if (Selection.data.useGradients)
+        {
+            var gradient = string.Join(", ", [
+                "transparent 0%",
+                $"{color.value} 20%",
+                "transparent 100%",
+            ]);
+            return $"background-image: linear-gradient(90deg, {gradient}); ";
+        }
+
         return $"background-color: {color.value}; ";
     }
 
@@ -120,13 +134,20 @@
         forceRender = true;
     }
 
-    void Edit_OnClick()
+    async Task Edit_OnClick()
     {
+        disposing = true;
+        while (!disposed)
+            await Task.Delay(50);
         nav.NavigateTo("/edit");
+
     }
 
-    void Tools_OnClick()
+    async Task Tools_OnClick()
     {
+        disposing = true;
+        while (!disposed)
+            await Task.Delay(50);
         nav.NavigateTo("/tools");
     }
 

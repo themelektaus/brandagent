@@ -30,7 +30,7 @@
 
 @implements IAsyncDisposable
 
-@inject NavigationManager nav
+@inject IJSRuntime js
 
 @code {
 
@@ -39,15 +39,15 @@
         await Selection.data.SaveAsync();
     }
 
-    void Back_OnClick()
+    async Task Back_OnClick()
     {
-        nav.NavigateTo("/");
+        await js.InvokeVoidAsync("history.back");
     }
 
-    void Delete_OnClick()
+    async Task Delete_OnClick()
     {
         Selection.data.items.RemoveAll(x => x.secret == Selection.activeSecret);
-        Back_OnClick();
+        await Back_OnClick();
     }
 
 }
