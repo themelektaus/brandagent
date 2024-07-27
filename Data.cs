@@ -53,7 +53,8 @@ public class Data
                 currentOtp = totp.ComputeTotp().Insert(3, " ");
                 timer = totp.RemainingSeconds();
 
-                totp = new Totp(secretKey, timeCorrection: new(DateTime.UtcNow.AddSeconds(30)));
+                var future = DateTime.UtcNow.AddSeconds(30);
+                totp = new Totp(secretKey, timeCorrection: new(future));
                 nextOtp = totp.ComputeTotp().Insert(3, " ");
             }
             catch
