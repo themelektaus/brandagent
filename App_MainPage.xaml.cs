@@ -43,12 +43,14 @@ public partial class App_MainPage : ContentPage
         catch (NotImplementedException ex)
         {
             await DisplayAlert("Not Implemented Exception", ex.Message, "Close");
+            blazorWebView.IsVisible = true;
             return;
         }
 
         if (response.Status != BiometricResponseStatus.Success)
         {
             await DisplayAlert($"Status: {response.Status}", response.ErrorMsg, "Close");
+            Utils.App.Quit();
             return;
         }
 

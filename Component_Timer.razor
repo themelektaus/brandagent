@@ -1,13 +1,13 @@
 ﻿<div class="timer">
     <canvas @ref="canvas" width="100" height="100"></canvas>
-    <span>@Value</span>
+    <span>@Context.timer</span>
 </div>
 
 @inject IJSRuntime js
 
 @code {
 
-    [Parameter] public int Value { get; set; }
+    [Parameter] public Data.Item.Context Context { get; set; }
 
     ElementReference canvas;
 
@@ -15,7 +15,7 @@
     {
         await js.InvokeVoidAsync(
             "renderCircle",
-            new object[] { canvas, Value / 30f, 10, "#9cf" }
+            new object[] { canvas, Context.timer / 30f, 10, "#9cf" }
         );
     }
 

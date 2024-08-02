@@ -2,20 +2,21 @@
 
 <div class="bar">
     <div class="@Info_GetStyleClass()">
-        <Component_Button Icon="edit" OnClick="Edit_OnClick" Style="position: absolute; align-self: flex-end; margin: 2.5em -.5em 0 0; " />
-        <Component_Button Icon="close" OnClick="ToggleInfo" Style="position: absolute; align-self: flex-end; margin: -.5em -.5em 0 0; " />
+        <Component_Button Icon="edit" OnClick="Edit_OnClick" Enabled="@(state == State.Ready)"
+                          Style="position: absolute; align-self: flex-end; margin: 2.5em -.5em 0 0; " />
+        <Component_Button Icon="close" OnClick="ToggleInfo" Enabled="@(state == State.Ready)"
+                          Style="position: absolute; align-self: flex-end; margin: -.5em -.5em 0 0; " />
         <div class="qr" style="background-image: url(@Selection.ActiveDataItem?.qr); "></div>
     </div>
     <div class="content">
-        <Component_Timer @ref="timerComponent" Value="@Selection.ActiveDataItemTimer" />
-        <Component_Otp Current="@Selection.ActiveDataItemCurrentOtp"
-                       Next="@((Selection.data?.showNextOtp ?? false) ? Selection.ActiveDataItemNextOtp : null)" />
-        @if (Selection.ActiveDataItem is not null && !visible)
+        <Component_Timer @ref="timerComponent" Context="Selection.ActiveDataItemContext" />
+        <Component_Otp Context="Selection.ActiveDataItemContext" />
+        @if (Selection.ActiveDataItem is not null && !infoVisible)
         {
             <Component_Button Icon="info" OnClick="ToggleInfo"
                               Style="position: absolute; right: 3.25em; " />
         }
-        <Component_Button Icon="tools" OnClick="Tools_OnClick" />
+        <Component_Button Icon="tools" OnClick="Tools_OnClick" Enabled="@(state == State.Ready)" />
     </div>
 </div>
 <div class="items">
@@ -30,7 +31,7 @@
     }
 </div>
 
-@implements IDisposable
+@implements IAsyncDisposable
 
 @inject NavigationManager nav
 
@@ -38,11 +39,20 @@
 
     Component_Timer timerComponent;
 
-    bool visible;
+    bool infoVisible;
 
     Task intervalTask;
-    bool disposed;
     bool forceRender;
+
+    enum State { Loading, Ready, Disposing, Disposed }
+    State state = State.Loading;
+
+    public async ValueTask DisposeAsync()
+    {
+        await Utils.WaitAsync(() => state == State.Loading);
+        state = State.Disposing;
+        await Utils.WaitAsync(() => state == State.Disposing);
+    }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -57,23 +67,30 @@
 
         intervalTask = Task.Run(async () =>
         {
-            while (!disposed)
+            while ((int) state < 2)
             {
                 Selection.ComputeActiveDataItem();
+
                 await InvokeAsync(StateHasChanged);
                 await timerComponent.RenderAsync();
-                for (var i = 0; i < 20 && !disposed && !forceRender; i++)
-                    await Task.Delay(50);
+
+                if (state == State.Loading)
+                {
+                    state = State.Ready;
+                    await InvokeAsync(StateHasChanged);
+                }
+
+                await Utils.WaitAsync(
+                    condition: () => (int) state < 2 && !forceRender,
+                    timeout: TimeSpan.FromSeconds(1)
+                );
+
                 forceRender = false;
             }
 
             Selection.ClearActiveDataItem();
+            state = State.Disposed;
         });
-    }
-
-    public void Dispose()
-    {
-        disposed = true;
     }
 
     IEnumerable<Data.Item> EnumerateItems()
@@ -92,12 +109,12 @@
 
     string Info_GetStyleClass()
     {
-        return "info" + (visible ? " visible" : "");
+        return "info" + (infoVisible ? " visible" : "");
     }
 
     void ToggleInfo()
     {
-        visible = !visible;
+        infoVisible = !infoVisible;
     }
 
     string Item_GetStyleClass(Data.Item item)
@@ -110,6 +127,16 @@
         var color = Selection.data.colors.FirstOrDefault(x => x.name == item.service);
         if (color is null)
             return string.Empty;
+
+        if (Selection.data.useGradients)
+        {
+            var gradient = string.Join(", ", [
+                "transparent 0%",
+                $"{color.value} 20%",
+                "transparent 100%",
+            ]);
+            return $"background-image: linear-gradient(90deg, {gradient}); ";
+        }
 
         return $"background-color: {color.value}; ";
     }
