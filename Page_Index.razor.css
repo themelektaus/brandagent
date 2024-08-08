@@ -38,13 +38,31 @@
     flex: 0 0 auto;
 }
 
+.services {
+    
+}
+
+.services > .service {
+    padding: .75em .5em;
+    cursor: pointer;
+    background-color: #292929;
+}
+
+.services > .service:hover {
+    filter: brightness(1.2);
+}
+
+.services > .service.active {
+    filter: brightness(1.4);
+}
+
 .items {
     flex: 1;
     overflow: hidden scroll;
     padding: .5em 0;
 }
 
-.item {
+.items > .item {
     cursor: pointer;
     color: #ccc;
     background-color: #333;
@@ -55,31 +73,31 @@
     align-items: center;
 }
 
-.item:hover {
+.items > .item:hover {
     filter: brightness(1.2);
 }
 
-.item.active {
+.items > .item.active {
     filter: brightness(1.4);
 }
 
-.item > * {
+.items > .item > * {
     text-overflow: ellipsis;
     overflow: hidden;
     padding: .75em .5em;
 }
 
-.item > .service {
+.items > .item > .service {
     flex: 1;
     text-align: right;
     background-color: #0006;
     height: 1.25em;
 }
 
-.item > .service::after {
+.items > .item > .service::after {
     content: attr(data-type);
 }
 
-.item > .name {
+.items > .item > .name {
     flex: 3;
 }

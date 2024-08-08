@@ -1,11 +1,11 @@
 ﻿.content {
     flex: 1;
-    padding: 1em 1em 3em;
     overflow: hidden auto;
     display: flex;
     flex-direction: column;
     justify-content: center;
     gap: .75em;
+    padding: 0 1em;
 }
 
 .content > div {

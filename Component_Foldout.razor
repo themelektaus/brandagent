@@ -1,0 +1,19 @@
+﻿<div class="foldout">
+    <div class="title" style="@TitleStyle" @onclick="Toggle">@Title</div>
+    <div class="content @(IsContentVisible ? "visible" : "" )">@Content</div>
+</div>
+
+@code {
+
+    [Parameter] public RenderFragment Title { get; set; }
+    [Parameter] public string TitleStyle { get; set; }
+
+    [Parameter] public RenderFragment Content { get; set; }
+    [Parameter] public bool IsContentVisible { get; set; }
+
+    void Toggle()
+    {
+        IsContentVisible = !IsContentVisible;
+    }
+
+}

@@ -8,6 +8,11 @@
     <h2>Settings</h2>
 
     <div style="display: flex; justify-content: center; margin: 0 1em; ">
+        <input type="checkbox" @bind="Selection.data.groupServices" style="flex: 0 0 1.25em; aspect-ratio: 1; " />
+        <label style="flex: 1; ">Group Services</label>
+    </div>
+
+    <div style="display: flex; justify-content: center; margin: 0 1em; ">
         <input type="checkbox" @bind="Selection.data.showNextOtp" style="flex: 0 0 1.25em; aspect-ratio: 1; " />
         <label style="flex: 1; ">Show next password</label>
     </div>
@@ -42,6 +47,8 @@
         </div>
     }
     <Component_Button Icon="add" OnClick="AddColor" Style="align-self: center; flex: 0 0 auto; " />
+
+    <div style="height: 50%; "></div>
 </div>
 
 @using Microsoft.Maui.Storage
@@ -71,7 +78,7 @@
         if (result is null)
             return;
 
-        var import = await Data.LoadAsync(result.FullPath);
+        var import = await Data.LoadFromFileAsync(result.FullPath);
         Selection.data.Add(import);
 
         await Selection.data.SaveAsync();
@@ -101,7 +108,7 @@
             path = _path;
         }
 
-        await Selection.data.SaveAsync(path);
+        await Selection.data.SaveToFileAsync(path);
     }
 
     void Add_OnClick()

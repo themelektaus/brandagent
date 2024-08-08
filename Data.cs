@@ -1,4 +1,7 @@
-﻿using Microsoft.Maui.Storage;
+﻿using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Core;
+
+using Microsoft.Maui.Storage;
 
 using OtpNet;
 
@@ -16,10 +19,11 @@ namespace Brandagent;
 
 public class Data
 {
-    static readonly System.Threading.SemaphoreSlim fileLock = new(1, 1);
+    static readonly System.Threading.SemaphoreSlim storageLock = new(1, 1);
 
+    public bool groupServices;
     public bool showNextOtp;
-    public bool useGradients = true;
+    public bool useGradients;
 
     public class Color
     {
@@ -86,44 +90,93 @@ public class Data
         IncludeFields = true
     };
 
-    static string GetPath()
+    static Data FromJson(string json) => json is null
+        ? new()
+        : JsonSerializer.Deserialize<Data>(json, jsonOptions);
+
+    string ToJson()
     {
-        return Path.Combine(
-            FileSystem.AppDataDirectory,
-            "data.json"
-        );
+        return JsonSerializer.Serialize(this, jsonOptions);
+    }
+
+    static string GetDataPath()
+    {
+        return Path.Combine(FileSystem.AppDataDirectory, "data.dat");
+    }
+
+    public async Task SaveAsync()
+    {
+        await storageLock.WaitAsync();
+        var encryptedData = EncryptedData.Encrypt(ToJson());
+        var password = Convert.ToBase64String(encryptedData.GetPassword());
+        await SecureStorage.SetAsync("password", password);
+        await File.WriteAllBytesAsync(GetDataPath(), encryptedData.Data);
+        storageLock.Release();
+    }
+
+    public async Task SaveToFileAsync(string path)
+    {
+        await storageLock.WaitAsync();
+        await File.WriteAllTextAsync(path, ToJson());
+        await Toast.Make(path, ToastDuration.Long).Show();
+        storageLock.Release();
     }
 
     public static async Task<Data> LoadAsync()
     {
-        return await LoadAsync(GetPath());
+        var path = GetDataPath();
+
+        if (!File.Exists(path))
+        {
+            return new();
+        }
+
+        Data data;
+
+        await storageLock.WaitAsync();
+
+        try
+        {
+            var encryptedData = EncryptedData.From(
+                password: Convert.FromBase64String(
+                    await SecureStorage.GetAsync("password")
+                ),
+                data: await File.ReadAllBytesAsync(path)
+            );
+
+            data = FromJson(encryptedData.Decrypt());
+        }
+        catch
+        {
+            data = new();
+        }
+
+        storageLock.Release();
+
+        return data;
     }
 
-    public static async Task<Data> LoadAsync(string path)
+    public static async Task<Data> LoadFromFileAsync(string path)
     {
         if (!File.Exists(path))
         {
             return new();
         }
 
-        await fileLock.WaitAsync();
-
-        using var stream = File.OpenRead(path);
-
         Data data;
+
+        await storageLock.WaitAsync();
 
         try
         {
-            data = await JsonSerializer.DeserializeAsync<Data>(stream, jsonOptions);
+            data = FromJson(await File.ReadAllTextAsync(path));
         }
         catch
         {
-            //var json = await File.ReadAllTextAsync(path);
-
             data = new();
         }
 
-        fileLock.Release();
+        storageLock.Release();
 
         return data;
     }
@@ -171,23 +224,5 @@ public class Data
             _item.service = item.service;
             _item.name = item.name;
         }
-    }
-
-    public async Task SaveAsync()
-    {
-        await SaveAsync(GetPath());
-    }
-
-    public async Task SaveAsync(string path)
-    {
-        await fileLock.WaitAsync();
-        using var stream = File.Create(path);
-        await JsonSerializer.SerializeAsync(stream, this, jsonOptions);
-        fileLock.Release();
-    }
-
-    public string ToJson()
-    {
-        return JsonSerializer.Serialize(this, jsonOptions);
     }
 }

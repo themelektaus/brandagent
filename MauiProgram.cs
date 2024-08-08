@@ -1,4 +1,6 @@
-﻿using Microsoft.Extensions.DependencyInjection;
+﻿using CommunityToolkit.Maui;
+
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 using Microsoft.Maui.Controls.Hosting;
@@ -15,9 +17,10 @@ public static class MauiProgram
         var builder = MauiApp
             .CreateBuilder()
             .UseMauiApp<App>()
+            .UseMauiCommunityToolkit()
             .UseBarcodeReader();
 
-        var services = builder.Services;
+    var services = builder.Services;
 
         services.AddMauiBlazorWebView();
 

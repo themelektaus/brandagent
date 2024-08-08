@@ -19,17 +19,38 @@
         <Component_Button Icon="tools" OnClick="Tools_OnClick" Enabled="@(state == State.Ready)" />
     </div>
 </div>
-<div class="items">
-    @foreach (var item in EnumerateItems())
-    {
-        <div class="@Item_GetStyleClass(item)"
-             style="@Item_GetAdditionalStyle(item)"
-             @onclick="() => Item_OnClick(item)">
-            <div class="service" data-type="@item.service"></div>
-            <div class="name">@item.name</div>
-        </div>
-    }
-</div>
+
+@if (Selection.GroupServices && activeService is null)
+{
+    <div class="services">
+        @foreach (var service in EnumerateServices())
+        {
+            <div class="@Service_GetStyleClass(service)"
+                 style="@Service_GetAdditionalStyle(service)"
+                 @onclick="() => Service_OnClick(service)">
+                @(Utils.IsEmpty(service) ? "(Unspecified)" : service)
+            </div>
+        }
+    </div>
+}
+else
+{
+    <div class="items">
+        @if (Selection.GroupServices)
+        {
+            <Component_Button OnClick="() => activeService = null" Icon="back" />
+        }
+        @foreach (var item in EnumerateItems())
+        {
+            <div class="@Item_GetStyleClass(item)"
+                 style="@Item_GetAdditionalStyle(item.service)"
+                 @onclick="() => Item_OnClick(item)">
+                <div class="service" data-type="@item.service"></div>
+                <div class="name">@item.name</div>
+            </div>
+        }
+    </div>
+}
 
 @implements IAsyncDisposable
 
@@ -47,8 +68,25 @@
     enum State { Loading, Ready, Disposing, Disposed }
     State state = State.Loading;
 
+    string activeService;
+
+    protected override void OnInitialized()
+    {
+        base.OnInitialized();
+
+        App.InstanceMainPage.backButton += OnBackButton;
+    }
+
+    void OnBackButton()
+    {
+        activeService = null;
+        forceRender = true;
+    }
+
     public async ValueTask DisposeAsync()
     {
+        App.InstanceMainPage.backButton -= OnBackButton;
+
         await Utils.WaitAsync(() => state == State.Loading);
         state = State.Disposing;
         await Utils.WaitAsync(() => state == State.Disposing);
@@ -58,12 +96,25 @@
     {
         await base.OnAfterRenderAsync(firstRender);
 
+        if (firstRender)
+        {
+            Selection.data = await Data.LoadAsync();
+
+            if (!Selection.GroupServices)
+            {
+                if (Selection.ActiveDataItem is null)
+                    Selection.activeSecret = EnumerateItems().FirstOrDefault()?.secret;
+            }
+        }
+
+        if (Selection.GroupServices && activeService is null)
+        {
+            Selection.activeSecret = null;
+            forceRender = true;
+        }
+
         if (!firstRender)
             return;
-
-        Selection.data = await Data.LoadAsync();
-        if (Selection.ActiveDataItem is null)
-            Selection.activeSecret = EnumerateItems().FirstOrDefault()?.secret;
 
         intervalTask = Task.Run(async () =>
         {
@@ -93,6 +144,18 @@
         });
     }
 
+    IEnumerable<string> EnumerateServices()
+    {
+        if (Selection.data is null)
+            return Enumerable.Empty<string>();
+
+        return Selection.data.items
+            .Where(x => !x.hidden)
+            .Select(x => x.service)
+            .Distinct()
+            .OrderBy(x => x);
+    }
+
     IEnumerable<Data.Item> EnumerateItems()
     {
         if (Selection.data is null)
@@ -104,7 +167,8 @@
             .ThenBy(x => x.name);
 
         foreach (var item in items)
-            yield return item;
+            if (activeService is null || item.service == activeService)
+                yield return item;
     }
 
     string Info_GetStyleClass()
@@ -119,19 +183,19 @@
 
     string Item_GetStyleClass(Data.Item item)
     {
-        return $"item" + (item == Selection.ActiveDataItem ? " active" : "");
+        return "item" + (item == Selection.ActiveDataItem ? " active" : "");
     }
 
-    string Item_GetAdditionalStyle(Data.Item item)
+    string Item_GetAdditionalStyle(string service)
     {
-        var color = Selection.data.colors.FirstOrDefault(x => x.name == item.service);
+        var color = Selection.data.colors.FirstOrDefault(x => x.name == service);
         if (color is null)
             return string.Empty;
 
         if (Selection.data.useGradients)
         {
             var gradient = string.Join(", ", [
-                "transparent 0%",
+            "transparent 0%",
                 $"{color.value} 20%",
                 "transparent 100%",
             ]);
@@ -144,6 +208,29 @@
     void Item_OnClick(Data.Item item)
     {
         Selection.activeSecret = item.secret;
+        forceRender = true;
+    }
+
+    string Service_GetStyleClass(string service)
+    {
+        return "service" + (service == activeService ? " active" : "");
+    }
+
+    string Service_GetAdditionalStyle(string service)
+    {
+        var color = Selection.data.colors.FirstOrDefault(x => x.name == service);
+
+        return color is null
+        ? string.Empty
+        : $"background-color: {color.value}; ";
+    }
+
+    void Service_OnClick(string service)
+    {
+        activeService = service;
+
+        Selection.activeSecret = EnumerateItems().FirstOrDefault()?.secret;
+
         forceRender = true;
     }
 

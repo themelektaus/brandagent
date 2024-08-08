@@ -10,6 +10,8 @@ namespace Brandagent;
 
 public partial class App_MainPage : ContentPage
 {
+    public event Action backButton;
+
     public App_MainPage()
     {
         Appearing += async (sender, e) => await App_MainPage_Appearing(sender, e);
@@ -17,8 +19,27 @@ public partial class App_MainPage : ContentPage
         InitializeComponent();
     }
 
+    protected override bool OnBackButtonPressed()
+    {
+        if (backButton is not null)
+        {
+            backButton.Invoke();
+            return true;
+        }
+
+        return base.OnBackButtonPressed();
+    }
+
     async Task App_MainPage_Appearing(object sender, EventArgs e)
     {
+        if (App.authorized)
+        {
+            blazorWebView.IsVisible = true;
+            return;
+        }
+
+        App.authorized = true;
+
         var service = BiometricAuthenticationService.Default;
 
         if (!service.IsPlatformSupported)
@@ -29,7 +50,8 @@ public partial class App_MainPage : ContentPage
 
         blazorWebView.IsVisible = false;
 
-        var request = new AuthenticationRequest {
+        var request = new AuthenticationRequest
+        {
             Title = "Authentication",
             AllowPasswordAuth = true
         };

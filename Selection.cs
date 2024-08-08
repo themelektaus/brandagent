@@ -5,13 +5,16 @@ namespace Brandagent;
 public static class Selection
 {
     public static Data data;
+
+    public static bool GroupServices => data?.groupServices ?? false;
+
     public static string activeSecret;
 
     public static Data.Item ActiveDataItem
         => data?.items.FirstOrDefault(x => x.secret == activeSecret);
 
     public static Data.Item.Context ActiveDataItemContext { get; private set; }
-    
+
     public static void ClearActiveDataItem()
     {
         ActiveDataItemContext = default;
